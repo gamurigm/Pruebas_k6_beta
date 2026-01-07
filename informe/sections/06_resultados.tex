@@ -1,0 +1,28 @@
+\section{Resultados}
+
+A continuación se presentan los resultados obtenidos de la ejecución de la prueba con 20 usuarios virtuales, los cuales se resumen en la Tabla \ref{tab:results}.
+
+\subsection{Análisis de Métricas Principales}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|l|l|l|c|}
+\hline
+\textbf{Métrica} & \textbf{Umbral} & \textbf{Resultado} & \textbf{Estado} \\ \hline
+http\_req\_duration (p95) & $<$ 500ms & 473.08ms & PASÓ \\ \hline
+http\_req\_failed (rate) & $<$ 1\% & 0.00\% & PASÓ \\ \hline
+Checks de éxito & 100\% & 100.00\% & PASÓ \\ \hline
+\end{tabular}
+\caption{Resumen de umbrales y resultados generales.}
+\label{tab:results}
+\end{table}
+
+\subsection{Estadísticas de Latencia}
+Los tiempos de respuesta registrados muestran una estabilidad adecuada bajo carga:
+\begin{itemize}
+    \item \textbf{Promedio (avg):} 249.96 ms
+    \item \textbf{Mediana (med):} 257.93 ms
+    \item \textbf{Máximo (max):} 502.8 ms
+\end{itemize}
+
+El sistema logró procesar un total de \textbf{1455 peticiones} con un rendimiento promedio de 13.12 reqs/s, sin registrar fallos durante toda la ejecución.

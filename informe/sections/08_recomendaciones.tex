@@ -1,0 +1,7 @@
+\section{Recomendaciones}
+
+\begin{itemize}
+    \item Se recomienda realizar pruebas de estrés (\textit{Stress Testing}) aumentando drásticamente el número de VUs para identificar el punto exacto de quiebre o degradación total del servicio.
+    \item Optimizar el manejo de procesos asíncronos en el servidor para reducir el tiempo máximo registrado (502.8ms) y así ampliar el margen de seguridad respecto al umbral de 500ms.
+    \item Integrar estos scripts de k6 en un pipeline de CI/CD para garantizar que nuevos cambios en el código no degraden el rendimiento histórico del sistema.
+\end{itemize}

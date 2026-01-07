@@ -1,0 +1,136 @@
+\subsection{Parte 1: Establecimiento del ambiente de pruebas}
+
+\subsubsection{Paso 1: Creación de API sencilla}
+Se procedió con la creación del archivo \texttt{server.js} (ver Listing \ref{lst:server}), configurando un servidor básico con Express que incluye:
+\begin{itemize}
+    \item Importación del módulo Express.
+    \item Implementación de rutas GET para simular respuestas simples con un retardo aleatorio de hasta 500ms.
+    \item Implementación de una ruta POST para recibir y procesar datos JSON.
+    \item Configuración del servidor para escuchar en el puerto 3333.
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=Implementación del servidor API REST, label={lst:server}]
+const express = require('express');
+const app = express();
+app.use(express.json());
+
+app.get('/api/test', (req, res) => {
+    const sleep = Math.floor(Math.random() * 500);
+    setTimeout(() => {
+        res.json({ message: 'Peticion procesada' });
+    }, sleep);
+})
+
+app.post('/api/data', (req, res) => {
+    res.status(201).json({ received: req.body });
+});
+
+app.listen(3333, '0.0.0.0', () => {
+    console.log('Servidor escuchando en http://localhost:3333');
+});
+\end{lstlisting}
+
+\subsubsection{Paso 2: Instalación de dependencias necesarias}
+Se gestionó el proyecto mediante \texttt{npm} siguiendo estos subpasos:
+\begin{enumerate}
+    \item Inicialización del proyecto con \texttt{npm init -y}.
+    \item Instalación de la dependencia de Express mediante \texttt{npm install express}.
+    \item Verificación de la ejecución con \texttt{node server.js}.
+\end{enumerate}
+
+Como se observa en la Figura \ref{fig:api_v2}, el servidor fue inicializado exitosamente tras la configuración de dependencias. Posteriormente, se validó el correcto funcionamiento de los endpoints mediante la herramienta \texttt{curl}; en la Figura \ref{fig:get_test} se aprecia la respuesta exitosa del método GET, mientras que en la Figura \ref{fig:endpoints_test} se confirma que ambos endpoints (GET y POST) se encuentran operativos y respondiendo según lo diseñado.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/cap1-paso1-v2.png}
+    \caption{Creación y estructura inicial de la API en Node.js.}
+    \label{fig:api_v2}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/cap2-paso1-get.png}
+    \caption{Prueba de funcionamiento del endpoint GET mediante curl.}
+    \label{fig:get_test}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{img/cap3-paso1-endpoints.png}
+    \caption{Validación de ambos endpoints (GET y POST) activos en el servidor.}
+    \label{fig:endpoints_test}
+\end{figure}
+
+\subsubsection{Paso 3: Instalación de k6}
+Dado que el ambiente se basa en WSL (Ubuntu), se realizó la instalación utilizando el repositorio oficial de k6, siguiendo los comandos detallados en el Listing \ref{lst:k6_install}. Se verificó la autenticidad del paquete mediante la importación de la llave GPG y la configuración del archivo \texttt{k6.list} en el directorio de fuentes de apt para asegurar una instalación estable y libre de errores de dependencias.
+
+\begin{lstlisting}[language=bash, caption=Comandos de instalación de k6 en WSL Ubuntu, label={lst:k6_install}]
+# 1. Importar la llave GPG de k6
+sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+
+# 2. Agregar el repositorio oficial
+echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+
+# 3. Actualizar la lista de paquetes e instalar
+sudo apt-get update
+sudo apt-get install k6
+\end{lstlisting}
+
+\subsubsection{Paso 4: Creación de Script de prueba con k6}
+Se desarrolló el archivo \texttt{carga-y-rendimiento.js} (ver Listing \ref{lst:k6_script}) configurando los siguientes elementos clave:
+\begin{itemize}
+    \item \textbf{Carga (Stages):} Simulación de un escalado de hasta 20 usuarios virtuales.
+    \item \textbf{Umbrales (Thresholds):} Definición de p(95) $<$ 500ms para latencia y tasa de fallo $<$ 1\%.
+    \item \textbf{Función Principal:} Ejecución periódica de peticiones GET y POST con validación de estados y tiempo de espera de 1 segundo entre iteraciones.
+\end{itemize}
+
+\begin{lstlisting}[language=JavaScript, caption=Fragmento del script de k6 con GET y POST, label={lst:k6_script}]
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+export const options = { ... };
+
+export default function () {
+    // Peticion GET
+    const resGet = http.get('http://localhost:3333/api/test');
+    check(resGet, { 'GET status is 200': (r) => r.status === 200 });
+
+    // Peticion POST
+    const payload = JSON.stringify({ user: 'Tester k6' });
+    const params = { headers: { 'Content-Type': 'application/json' } };
+    const resPost = http.post('http://localhost:3333/api/data', payload, params);
+    check(resPost, { 'POST status is 201': (r) => r.status === 201 });
+
+    sleep(1);
+}
+\end{lstlisting}
+
+Tras la configuración del script, se ejecutó la prueba de carga obteniendo los resultados visualizados en la Figura \ref{fig:k6_execution}. El análisis detallado de estas métricas se presenta a continuación, basándose en los datos recolectados durante la ejecución.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/cap-paso4-v2.png}
+    \caption{Ejecución exitosa del script de k6 y validación de umbrales.}
+    \label{fig:k6_execution}
+\end{figure}
+
+\textbf{Análisis de Resultados (k6):}
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    \textbf{Métrica de Rendimiento} & \textbf{Valor Obtenido} & \textbf{Umbral / Objetivo} & \textbf{Estado} \\ \hline
+    Usuarios Virtuales (VUs) & 20 & Máximo estipulado & Completado \\ \hline
+    Iteraciones Totales & 1455 & N/A & Valido \\ \hline
+    Tiempo de Respuesta (p95) & 473.08 ms & $<$ 500 ms & \textbf{PASÓ} \\ \hline
+    Tasa de Errores (HTTP 4xx/5xx) & 0.00\% & $<$ 1\% & \textbf{PASÓ} \\ \hline
+    Verificaciones (Checks) Exitosos & 100.00\% & 100\% & \textbf{PASÓ} \\ \hline
+    Throughput (Solicitudes/seg) & 13.12 reqs/s & N/A & Estable \\ \hline
+    \end{tabular}
+    \caption{Métricas detalladas de la ejecución de pruebas de carga en el Paso 4.}
+    \label{tab:k6_detailed_results}
+\end{table}
+
+El análisis de la Tabla \ref{tab:k6_detailed_results} demuestra que el sistema mantuvo un comportamiento estable bajo la carga máxima alcanzada (20 VUs). Se realizaron 2910 verificaciones individuales (estado HTTP 200/201 y validación de mensajes), todas con éxito rotundo.
+
