@@ -16,8 +16,9 @@
 *.upa
 *.upb
 *.pdf
-# Keep PDFs in docs directory
+# Keep main PDF and PDFs in docs directory
 !docs/**/*.pdf
+!informe/main.pdf
 
 # OS generated files
 .DS_Store
