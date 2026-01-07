@@ -4,7 +4,7 @@ import { check, sleep } from 'k6';
 // Configuración de la prueba (stages y thresholds)
 export let options = {
     stages: [
-        { duration: '30s', target: 20 }, // 1. Subida: de 0 a 20 usuarios en 30s
+        { duration: '30s', target: 100 }, // 1. Subida: de 0 a 20 usuarios en 30s
         { duration: '1m', target: 20 },  // 2. Meseta: mantener 20 usuarios por 1m
         { duration: '30s', target: 0 },  // 3. Bajada: de 20 a 0 usuarios en 30s
     ],

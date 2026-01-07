@@ -1,12 +1,53 @@
-\subsection{Parte 2: Realizar pruebas con k6}
-
-En esta sección se describirá el proceso de ejecución de las pruebas y la interpretación de los resultados obtenidos.
+\subsection{Parte 2: Ejecución y análisis de pruebas de carga y rendimiento con k6}
 
 \subsubsection{Paso 1: Ejecución de las pruebas de carga y rendimiento}
-[Pendiente de completar]
+Para evaluar el desempeño de la API creada en la Parte 1, se ejecutó el script de k6 (\texttt{carga-y-rendimiento.js}) utilizando el comando:
+
+\begin{lstlisting}[language=bash, caption=Ejecución de prueba de carga con k6, label={lst:k6_run}]
+k6 run carga-y-rendimiento.js
+\end{lstlisting}
+
+El script simula hasta 20 usuarios virtuales (VUs) durante 2 minutos, realizando peticiones GET y POST hacia los endpoints de la API. Se definieron umbrales para medir latencia y errores, asegurando que:
+
+\begin{itemize}
+    \item \texttt{http\_req\_duration} (latencia) p95 $<$ 500ms.
+    \item \texttt{http\_req\_failed} (tasa de fallos) $<$ 1\%.
+\end{itemize}
+
+La ejecución del comando generó la salida mostrada en la Figura \ref{fig:k6_execution_step1}, donde se observa que todas las solicitudes se completaron correctamente, cumpliendo los umbrales definidos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\textwidth]{img/p2_ejecucion.png}
+    \caption{Resultado de la ejecución del script de k6 para 20 VUs.}
+    \label{fig:k6_execution_step1}
+\end{figure}
 
 \subsubsection{Paso 2: Interpretación de métricas}
-[Pendiente de completar]
+Una vez completada la ejecución, se analizaron las métricas principales reportadas por k6:
 
-\subsubsection{Paso 3: Cambio en la configuración del test}
-[Pendiente de completar]
+\begin{itemize}
+    \item \textbf{http\_req\_duration:} Indica la latencia de las solicitudes. En la Figura \ref{fig:k6_execution_step1} se observa que p95 = 462.78ms, cumpliendo el umbral de $<$ 500ms.
+    \item \textbf{http\_req\_failed:} Muestra la proporción de solicitudes fallidas. En esta ejecución, 0\% de errores fueron detectados, evidenciando la robustez del servidor bajo 20 VUs.
+    \item \textbf{http\_reqs:} Total de solicitudes realizadas. Se completaron 2906 solicitudes durante el test, lo que refleja la capacidad de manejo de tráfico del servidor.
+    \item \textbf{vus:} Número de usuarios virtuales simulados. Se alcanzaron hasta 20 VUs, simulando carga concurrente en el servidor.
+\end{itemize}
+
+Para resumir los resultados, se presenta la Tabla \ref{tab:k6_metrics_step2}:
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|l|c|c|c|}
+    \hline
+    \textbf{Métrica de Rendimiento} & \textbf{Valor Obtenido} & \textbf{Umbral / Objetivo} & \textbf{Estado} \\ \hline
+    Usuarios Virtuales (VUs) & 20 & Máximo estipulado & Completado \\ \hline
+    Iteraciones Totales & 1453 & N/A & Valido \\ \hline
+    Tiempo de Respuesta (p95) & 462.78 ms & $<$ 500 ms & \textbf{PASÓ} \\ \hline
+    Tasa de Errores HTTP & 0.00\% & $<$ 1\% & \textbf{PASÓ} \\ \hline
+    Verificaciones (Checks) Exitosos & 100.00\% & 100\% & \textbf{PASÓ} \\ \hline
+    Throughput (Solicitudes/seg) & 13.12 req/s & N/A & Estable \\ \hline
+    \end{tabular}
+    \caption{Métricas de rendimiento obtenidas para 20 VUs.}
+    \label{tab:k6_metrics_step2}
+\end{table}
+

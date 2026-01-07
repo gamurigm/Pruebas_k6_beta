@@ -1,7 +1,7 @@
 {
   "name": "taller-k6",
   "version": "1.0.0",
-  "description": "",
+  "description": "Este proyecto es parte del taller de pruebas de software. Contiene un servidor de API simple y un script de pruebas de rendimiento utilizando **k6**.",
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
