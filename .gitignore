@@ -18,7 +18,7 @@
 *.pdf
 # Keep main PDF and PDFs in docs directory
 !docs/**/*.pdf
-!informe/main.pdf
+
 !informe/build/main.pdf
 
 # OS generated files
