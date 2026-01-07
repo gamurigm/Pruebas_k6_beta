@@ -33,9 +33,11 @@ yarn-error.log*
 .npm
 
 # Build directories
+informe/build/
+!informe/build/
 informe/build/*
 !informe/build/main.pdf
-build/
+/build/
 
 # IDEs
 .vscode/
