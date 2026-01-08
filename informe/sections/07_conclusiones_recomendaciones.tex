@@ -3,5 +3,8 @@
 \begin{itemize}
     \item El servidor Express demostró ser capaz de manejar 20 usuarios virtuales concurrentes manteniendo un tiempo de respuesta p(95) por debajo de los 500ms, lo cual indica una arquitectura estable para este nivel de carga.
     \item La herramienta k6 facilitó la identificación de métricas críticas de rendimiento y la validación automática de criterios de calidad mediante el uso de \textit{thresholds}.
-    
+    \item Las pruebas de carga realizadas con distintos niveles de usuarios virtuales permitieron evaluar de manera objetiva el comportamiento de la API REST bajo escenarios de concurrencia creciente. Los resultados evidencian que el sistema mantuvo una latencia p95 inferior a 500 ms y una tasa de errores del 0 \% incluso al incrementar progresivamente la carga, lo que demuestra una correcta gestión de solicitudes concurrentes.
+    \item La estabilidad observada en los tiempos de respuesta y la ausencia de fallos indican que la arquitectura basada en Node.js y Express es adecuada para soportar cargas moderadas y altas, cumpliendo con los criterios de calidad esperados.
 \end{itemize}
+
+
