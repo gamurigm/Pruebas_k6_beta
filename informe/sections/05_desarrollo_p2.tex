@@ -3,51 +3,161 @@
 \subsubsection{Paso 1: Ejecución de las pruebas de carga y rendimiento}
 Para evaluar el desempeño de la API creada en la Parte 1, se ejecutó el script de k6 (\texttt{carga-y-rendimiento.js}) utilizando el comando:
 
-\begin{lstlisting}[language=bash, caption=Ejecución de prueba de carga con k6, label={lst:k6_run}]
+\begin{lstlisting}[language=bash, caption=Ejecución de prueba de carga con k6 para 50 VUs, label={lst:k6_run_50vus}]
 k6 run carga-y-rendimiento.js
 \end{lstlisting}
 
-El script simula hasta 20 usuarios virtuales (VUs) durante 2 minutos, realizando peticiones GET y POST hacia los endpoints de la API. Se definieron umbrales para medir latencia y errores, asegurando que:
+El script simula hasta 50 usuarios virtuales (VUs) durante 2 minutos, realizando peticiones GET y POST hacia los endpoints de la API. Se definieron umbrales para medir latencia y errores, asegurando que:
 
 \begin{itemize}
-    \item \texttt{http\_req\_duration} (latencia) p95 $<$ 500ms.
+    \item \texttt{http\_req\_duration} (latencia) p95 $<$ 500 ms.
     \item \texttt{http\_req\_failed} (tasa de fallos) $<$ 1\%.
 \end{itemize}
 
-La ejecución del comando generó la salida mostrada en la Figura \ref{fig:k6_execution_step1}, donde se observa que todas las solicitudes se completaron correctamente, cumpliendo los umbrales definidos.
+La ejecución del comando generó la salida mostrada en la Figura \ref{fig:k6_execution_50vus}, donde se observa que todas las solicitudes se completaron correctamente, cumpliendo los umbrales definidos.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{img/p2_ejecucion.png}
-    \caption{Resultado de la ejecución del script de k6 para 20 VUs.}
-    \label{fig:k6_execution_step1}
+    \caption{Resultado de la ejecución del script de k6 para 50 VUs.}
+    \label{fig:k6_execution_50vus}
 \end{figure}
 
-\subsubsection{Paso 2: Interpretación de métricas}
-Una vez completada la ejecución, se analizaron las métricas principales reportadas por k6:
+\subsubsection{Paso 2: Interpretación detallada de métricas}
+Una vez completada la ejecución, se analizaron las métricas principales reportadas por k6, considerando tanto rendimiento como robustez de la API:
 
 \begin{itemize}
-    \item \textbf{http\_req\_duration:} Indica la latencia de las solicitudes. En la Figura \ref{fig:k6_execution_step1} se observa que p95 = 462.78ms, cumpliendo el umbral de $<$ 500ms.
-    \item \textbf{http\_req\_failed:} Muestra la proporción de solicitudes fallidas. En esta ejecución, 0\% de errores fueron detectados, evidenciando la robustez del servidor bajo 20 VUs.
-    \item \textbf{http\_reqs:} Total de solicitudes realizadas. Se completaron 2906 solicitudes durante el test, lo que refleja la capacidad de manejo de tráfico del servidor.
-    \item \textbf{vus:} Número de usuarios virtuales simulados. Se alcanzaron hasta 20 VUs, simulando carga concurrente en el servidor.
+    \item \textbf{http\_req\_duration:} Esta métrica indica la latencia de las solicitudes HTTP. La latencia p95 fue de 452.21 ms, lo que significa que el 95\% de las solicitudes se completaron en menos de 452.21 ms. Este valor está dentro del umbral establecido de 500 ms, lo que indica que la API puede manejar 50 VUs sin degradación significativa en el tiempo de respuesta.
+
+    \item \textbf{http\_req\_failed:} Muestra la proporción de solicitudes que fallaron por errores HTTP. En esta ejecución se registró 0\% de errores, evidenciando que el sistema maneja correctamente la carga concurrente y no presenta fallos en la comunicación ni interrupciones de servicio.
+
+    \item \textbf{http\_reqs:} Número total de solicitudes realizadas durante el test. Se realizaron 5134 solicitudes, lo que refleja la capacidad de la API para procesar un alto volumen de peticiones en paralelo sin pérdida de integridad ni errores.
+
+    \item \textbf{Iterations:} Cada iteración representa un ciclo completo de ejecución del script para un VU. Se completaron 2567 iteraciones, con una duración promedio de 1.25 s por iteración, indicando que cada usuario virtual pudo realizar múltiples solicitudes de manera eficiente.
+
+    \item \textbf{Throughput:} Calculado como solicitudes por segundo (req/s), fue de 42.73 req/s. Esto evidencia un aumento proporcional en la capacidad de procesamiento respecto a cargas menores (20 VUs), manteniendo estabilidad y consistencia en el desempeño.
+
+    \item \textbf{vus:} Número de usuarios virtuales concurrentes simulados. En esta prueba se alcanzaron hasta 50 VUs, logrando una simulación realista de carga concurrente sobre la API.
+
+    \item \textbf{Network:} La cantidad de datos transferidos fue de 1.7 MB recibidos y 780 kB enviados, demostrando que la API puede manejar un flujo considerable de información sin generar errores ni saturación de red.
 \end{itemize}
 
-Para resumir los resultados, se presenta la Tabla \ref{tab:k6_metrics_step2}:
+Para resumir los resultados, se presenta la Tabla \ref{tab:k6_metrics_50vus}:
 
 \begin{table}[H]
     \centering
     \begin{tabular}{|l|c|c|c|}
     \hline
     \textbf{Métrica de Rendimiento} & \textbf{Valor Obtenido} & \textbf{Umbral / Objetivo} & \textbf{Estado} \\ \hline
-    Usuarios Virtuales (VUs) & 20 & Máximo estipulado & Completado \\ \hline
-    Iteraciones Totales & 1453 & N/A & Valido \\ \hline
-    Tiempo de Respuesta (p95) & 462.78 ms & $<$ 500 ms & \textbf{PASÓ} \\ \hline
+    Usuarios Virtuales (VUs) & 50 & Máximo estipulado & Completado \\ \hline
+    Iteraciones Totales & 2567 & N/A & Válido \\ \hline
+    Tiempo de Respuesta (p95) & 452.21 ms & $<$ 500 ms & \textbf{PASÓ} \\ \hline
     Tasa de Errores HTTP & 0.00\% & $<$ 1\% & \textbf{PASÓ} \\ \hline
     Verificaciones (Checks) Exitosos & 100.00\% & 100\% & \textbf{PASÓ} \\ \hline
-    Throughput (Solicitudes/seg) & 13.12 req/s & N/A & Estable \\ \hline
+    Throughput (Solicitudes/seg) & 42.73 req/s & N/A & Estable \\ \hline
     \end{tabular}
-    \caption{Métricas de rendimiento obtenidas para 20 VUs.}
-    \label{tab:k6_metrics_step2}
+    \caption{Métricas de rendimiento obtenidas para 50 VUs.}
+    \label{tab:k6_metrics_50vus}
 \end{table}
+\subsection{Parte 3: Cambio en la configuración del test}
+
+Con el objetivo de evaluar la respuesta del sistema bajo distintas cargas, se realizaron ejecuciones sucesivas del script de k6 variando el número de usuarios virtuales (VUs) a 100, 150, 200 y 300.  
+
+\subsubsection{Paso 3: Ejecución de pruebas con diferentes cargas}
+
+\begin{enumerate}
+    \item \textbf{Escenario 1: 100 VUs}  
+    Se ejecutó la prueba con 100 usuarios virtuales mediante el comando:
+    \begin{lstlisting}[language=bash, caption=Ejecución k6 con 100 VUs]
+k6 run carga-y-rendimiento.js
+    \end{lstlisting}
+    La salida de la prueba se visualiza en la Figura \ref{fig:k6_100vus}.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{img/p2_ejecucion100.png}
+        \caption{Resultados de la prueba con 100 VUs.}
+        \label{fig:k6_100vus}
+    \end{figure}
+
+    \textbf{Interpretación:}  
+    Como se observa en la Figura \ref{fig:k6_100vus}, la latencia p95 fue de 460.09 ms, sin errores HTTP y con 100\% de verificaciones exitosas. Esto indica que la API escala adecuadamente bajo una carga mayor, manteniendo robustez y tiempos de respuesta dentro del umbral esperado.
+
+    \item \textbf{Escenario 2: 150 VUs}  
+    Se ejecutó la prueba con 150 usuarios virtuales:
+    \begin{lstlisting}[language=bash, caption=Ejecución k6 con 150 VUs]
+k6 run carga-y-rendimiento.js
+    \end{lstlisting}
+    Resultados en la Figura \ref{fig:k6_150vus}.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{img/p2_ejecucion150.png}
+        \caption{Resultados de la prueba con 150 VUs.}
+        \label{fig:k6_150vus}
+    \end{figure}
+
+    \textbf{Interpretación:}  
+    La latencia p95 descendió ligeramente a 452.52 ms, permaneciendo por debajo del umbral de 500 ms. El número de iteraciones y el throughput aumentaron proporcionalmente, mientras que no se registraron errores HTTP, evidenciando la estabilidad de la API bajo cargas medias.
+
+    \item \textbf{Escenario 3: 200 VUs}  
+    Para 200 usuarios virtuales, se ejecutó:
+    \begin{lstlisting}[language=bash, caption=Ejecución k6 con 200 VUs]
+k6 run carga-y-rendimiento.js
+    \end{lstlisting}
+    Resultados en la Figura \ref{fig:k6_200vus}.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{img/p2_ejecucion200.png}
+        \caption{Resultados de la prueba con 200 VUs.}
+        \label{fig:k6_200vus}
+    \end{figure}
+
+    \textbf{Interpretación:}  
+    La latencia p95 se mantuvo estable en 454.07 ms. No se registraron errores HTTP y el throughput creció proporcionalmente al incremento de VUs, demostrando buena escalabilidad y robustez de la API ante cargas altas.
+
+    \item \textbf{Escenario 4: 300 VUs}  
+    Finalmente, se ejecutó la prueba con 300 usuarios virtuales:
+    \begin{lstlisting}[language=bash, caption=Ejecución k6 con 300 VUs]
+k6 run carga-y-rendimiento.js
+    \end{lstlisting}
+    Resultados en la Figura \ref{fig:k6_300vus}.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.9\textwidth]{img/p2_ejecucion300.png}
+        \caption{Resultados de la prueba con 300 VUs.}
+        \label{fig:k6_300vus}
+    \end{figure}
+
+    \textbf{Interpretación:}  
+    La latencia p95 fue de 454.67 ms, permaneciendo dentro del umbral definido. No se registraron errores y el throughput aumentó significativamente, lo que indica que la API mantiene robustez y escalabilidad aún bajo cargas extremas.
+\end{enumerate}
+
+\subsubsection{Paso 2: Análisis comparativo de métricas}
+
+Como se observa en las Figuras \ref{fig:k6_100vus} a \ref{fig:k6_300vus}, al aumentar la carga de 100 a 300 VUs:
+
+\begin{itemize}
+    \item La latencia p95 se mantuvo estable y siempre por debajo de 500 ms, mostrando consistencia en el rendimiento.
+    \item La tasa de errores HTTP se mantuvo en 0\%, evidenciando alta robustez del sistema.
+    \item El throughput y el número de iteraciones crecieron proporcionalmente al número de usuarios virtuales.
+    \item La API demostró buena escalabilidad, respondiendo de manera eficiente ante incrementos sucesivos de carga.
+\end{itemize}
+
+\begin{table}[H]
+\centering
+\caption{Comparativa de métricas de rendimiento según número de VUs}
+\label{tab:comparativa_vus}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+\textbf{VUs} & \textbf{p95 (ms)} & \textbf{HTTP Errors (\%)} & \textbf{Iteraciones} & \textbf{Throughput (req/s)} \\ \hline
+100 & 460.09 & 0.00 & 4374  & 72.28  \\ \hline
+150 & 452.52 & 0.00 & 6199  & 102.69 \\ \hline
+200 & 454.07 & 0.00 & 8014  & 132.68 \\ \hline
+300 & 454.67 & 0.00 & 11661 & 193.08 \\ \hline
+\end{tabular}
+\end{table}
+
 

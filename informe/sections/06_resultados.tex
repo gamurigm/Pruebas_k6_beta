@@ -1,28 +1,54 @@
-\section{Resultados}
+\subsection{Resultados de Pruebas con Diferentes Cargas de Usuarios Virtuales}
 
-A continuación se presentan los resultados obtenidos de la ejecución de la prueba con 20 usuarios virtuales, los cuales se resumen en la Tabla \ref{tab:results}.
-
-\subsection{Análisis de Métricas Principales}
+A continuación se presentan los resultados obtenidos de la ejecución de las pruebas con distintos usuarios virtuales (VUs), los cuales se resumen en la Tabla \ref{tab:results_vus}. Se evaluaron escenarios con 20, 50, 100, 150, 200 y 300 VUs para analizar la latencia, la robustez y el throughput del sistema bajo distintas cargas.
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|l|l|l|c|}
+\begin{tabularx}{\textwidth}{|c|X|X|X|X|}
 \hline
-\textbf{Métrica} & \textbf{Umbral} & \textbf{Resultado} & \textbf{Estado} \\ \hline
-http\_req\_duration (p95) & $<$ 500ms & 473.08ms & PASÓ \\ \hline
-http\_req\_failed (rate) & $<$ 1\% & 0.00\% & PASÓ \\ \hline
-Checks de éxito & 100\% & 100.00\% & PASÓ \\ \hline
-\end{tabular}
-\caption{Resumen de umbrales y resultados generales.}
-\label{tab:results}
+\textbf{VUs} & \textbf{http\_req\_duration (p95)} & \textbf{http\_req\_failed} & \textbf{Checks de éxito} & \textbf{Throughput (reqs/s)} \\ \hline
+20  & 462.78 ms & 0.00\% & 100\% & 13.12 \\ \hline
+50  & 452.21 ms & 0.00\% & 100\% & 42.73 \\ \hline
+100 & 460.09 ms & 0.00\% & 100\% & 72.28 \\ \hline
+150 & 452.52 ms & 0.00\% & 100\% & 102.69 \\ \hline
+200 & 454.07 ms & 0.00\% & 100\% & 132.69 \\ \hline
+300 & 454.67 ms & 0.00\% & 100\% & 193.08 \\ \hline
+\end{tabularx}
+\caption{Resumen de métricas principales obtenidas para diferentes cargas de usuarios virtuales.}
+\label{tab:results_vus}
 \end{table}
 
-\subsection{Estadísticas de Latencia}
-Los tiempos de respuesta registrados muestran una estabilidad adecuada bajo carga:
+\subsubsection{Análisis de Métricas Principales}
+
+Como se observa en la Tabla \ref{tab:results_vus}, todos los escenarios evaluados mantienen la latencia p95 por debajo del umbral de 500 ms, con una tasa de errores nula y 100\% de verificaciones exitosas. Esto evidencia la robustez del servidor bajo cargas progresivamente mayores.
+
+El throughput aumenta proporcionalmente con el número de usuarios virtuales, reflejando la capacidad de manejo de tráfico del servidor.
+
+\subsubsection{Estadísticas de Latencia}
+
+Los tiempos de respuesta registrados muestran estabilidad adecuada bajo todas las cargas evaluadas:
+
 \begin{itemize}
-    \item \textbf{Promedio (avg):} 249.96 ms
-    \item \textbf{Mediana (med):} 257.93 ms
-    \item \textbf{Máximo (max):} 502.8 ms
+    \item \textbf{20 VUs:} avg = 128.39 ms, med = 2.56 ms, max = 513.01 ms
+    \item \textbf{50 VUs:} avg = 128.52 ms, med = 2.27 ms, max = 515.8 ms
+    \item \textbf{100 VUs:} avg = 129.77 ms, med = 2.65 ms, max = 513.48 ms
+    \item \textbf{150 VUs:} avg = 128.02 ms, med = 2.3 ms, max = 515.9 ms
+    \item \textbf{200 VUs:} avg = 127.83 ms, med = 2.84 ms, max = 513.22 ms
+    \item \textbf{300 VUs:} avg = 127.25 ms, med = 3 ms, max = 513.21 ms
 \end{itemize}
 
-El sistema logró procesar un total de \textbf{1455 peticiones} con un rendimiento promedio de 13.12 reqs/s, sin registrar fallos durante toda la ejecución.
+El sistema logró procesar un total de peticiones que varía según la carga, con un rendimiento creciente de throughput (reqs/s) proporcional al número de VUs, sin registrar fallos en ninguna de las pruebas.
+
+\subsubsection{Interpretación General}
+
+Como se puede observar en la Tabla \ref{tab:results_vus}:
+
+\begin{itemize}
+    \item La latencia p95 se mantiene estable y por debajo del umbral de 500 ms, incluso al aumentar la carga a 300 VUs.
+    \item La tasa de errores HTTP permanece en 0\%, evidenciando la robustez de la API.
+    \item El throughput aumenta de manera lineal conforme se incrementa el número de usuarios virtuales, mostrando escalabilidad del sistema.
+    \item Todos los checks definidos en k6 se completan satisfactoriamente, asegurando la correcta funcionalidad de los endpoints bajo cargas crecientes.
+\end{itemize}
+
+Estos resultados permiten concluir que la API es capaz de manejar cargas crecientes de usuarios virtuales manteniendo latencias bajas y cero errores, demostrando estabilidad y escalabilidad.
+
