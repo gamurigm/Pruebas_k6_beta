@@ -7,4 +7,13 @@ Node.js es un entorno de ejecución de JavaScript orientado a eventos, diseñado
 k6 es una herramienta de pruebas de rendimiento de código abierto, moderna y centrada en el flujo de trabajo del desarrollador. En el contexto de arquitecturas modernas, las pruebas de carga permiten mitigar riesgos asociados a la escalabilidad y al consumo de recursos en entornos de producción saturados \cite{bezemer2019performance}. Esta herramienta permite escribir scripts en JavaScript, optimizando la simulación de usuarios virtuales (VUs) con un consumo eficiente de memoria.
 
 \subsection{Métricas de Rendimiento}
-Las métricas analizadas en este estudio incluyen el tiempo de respuesta, throughput y la tasa de peticiones fallidas, elementos críticos para determinar el Punto de Saturación de un sistema backend \cite{vukovic2020performance}.
+Las métricas de rendimiento son indicadores cuantitativos del comportamiento de un sistema bajo carga y son fundamentales para evaluar la calidad del servicio \cite{vukovic2020performance}. Entre las más relevantes se encuentran:
+
+\begin{itemize}
+    \item \textbf{Tiempo de respuesta (latencia):} Mide cuánto tarda el sistema en responder a una solicitud. Los percentiles (por ejemplo p95) son ampliamente usados para entender la variabilidad y comportamiento de cola de las respuestas \cite{chucksacademyPerformance}.
+    \item \textbf{Throughput:} Representa la cantidad de solicitudes exitosas procesadas por segundo (reqs/s), lo que indica la capacidad de manejo de tráfico del sistema \cite{turn0search1}.
+    \item \textbf{Tasa de peticiones fallidas:} Proporción de solicitudes que resultan en errores (como códigos HTTP 4xx o 5xx), indicador de robustez ante carga \cite{turn0search1}.
+    \item \textbf{Usuarios Virtuales (VUs):} Número de instancias que simulan usuarios simultáneos, utilizado para modelar carga concurrente en pruebas de rendimiento \cite{turn0search5}.
+\end{itemize}
+
+Estas métricas permiten determinar el punto de saturación de un backend y ofrecen una base para comparaciones objetivas entre diferentes configuraciones o versiones de un sistema \cite{turn0search9}.
